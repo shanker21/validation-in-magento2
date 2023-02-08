@@ -1,0 +1,256 @@
+<?php
+$_helperMdcCatalog = $this->helper('MDC\Catalog\Helper\Data');
+$mediaUrl = $_helperMdcCatalog->getProductImageUrl();
+?>
+<div class="code-wrapper">
+	<div class="table-wrapper">
+		<form id="submit_form" action="##">  
+			<input type="hidden" name="form_key" value="<?php echo $block->getFormKey() ?>" />
+			<div class="sbbc-wrapper">
+				<div class="sbbc-controls"> 
+					<div class="sbbc-items-headings">
+						<div> Brochure Code </div>
+						<div> Quantity </div>
+						<div> Description </div>
+					</div>
+					<div class="actions-primary addtobasket"> 
+						<p class="add-to-basket-error" style="display: none;">You need to add some items below first</p>
+
+						<button  name="submit" id="submit" class="alltocart-product action tocart primary">Add all to basket</button>
+					</div>
+				</div>
+
+				<div class="sbbc-items-container">
+					<?php for($i=0; $i < 15; $i++)  { ?>
+						<div class="sbbc-items-value" data-items-value="<?php echo $i; ?>">
+							<div class="sbbc-item-list" data-sbbc-item="<?php echo $i; ?>">
+								<div class="item-sku" data-item-sku="<?php echo $i; ?>" style="">
+									<input type="text" class="item-input-sku" name="items[<?php echo $i; ?>][sku]" data-input-sku="<?php echo $i; ?>">
+									<img class="loader-img" src="<?= $block->getViewFileUrl('images/download.gif'); ?>" style="display:none;" />
+								</div>
+								<div class="item-quantity"> 
+									<input type="text" class="input-quantity" name="items[<?php echo $i; ?>][qty]"> 
+								</div>
+								
+								<div class="input-description" style="display: none; width:100%"> 
+									<img class="product-image" src=""  width="60" height="60" alt="" />
+									<div class="item-name-section"><p class="item-name"></p>
+									<div class="item-remove" style="display: none;" data-item-remove="<?php echo $i; ?>">
+									<p class="remove-item-section">
+										<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" width="1.5em" height="1.5em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 20 20">
+											<path fill="currentColor" d="m9.129 0l1.974.005c.778.094 1.46.46 2.022 1.078c.459.504.7 1.09.714 1.728h5.475a.69.69 0 0 1 .686.693a.689.689 0 0 1-.686.692l-1.836-.001v11.627c0 2.543-.949 4.178-3.041 4.178H5.419c-2.092 0-3.026-1.626-3.026-4.178V4.195H.686A.689.689 0 0 1 0 3.505c0-.383.307-.692.686-.692h5.47c.014-.514.205-1.035.554-1.55C7.23.495 8.042.074 9.129 0Zm6.977 4.195H3.764v11.627c0 1.888.52 2.794 1.655 2.794h9.018c1.139 0 1.67-.914 1.67-2.794l-.001-11.627ZM6.716 6.34c.378 0 .685.31.685.692v8.05a.689.689 0 0 1-.686.692a.689.689 0 0 1-.685-.692v-8.05c0-.382.307-.692.685-.692Zm2.726 0c.38 0 .686.31.686.692v8.05a.689.689 0 0 1-.686.692a.689.689 0 0 1-.685-.692v-8.05c0-.382.307-.692.685-.692Zm2.728 0c.378 0 .685.31.685.692v8.05a.689.689 0 0 1-.685.692a.689.689 0 0 1-.686-.692v-8.05a.69.69 0 0 1 .686-.692ZM9.176 1.382c-.642.045-1.065.264-1.334.662c-.198.291-.297.543-.313.768l4.938-.001c-.014-.291-.129-.547-.352-.792c-.346-.38-.73-.586-1.093-.635l-1.846-.002Z"/>
+										</svg>  
+										Remove item 
+									</p>
+								</div></div>
+									<p class="item-price"></p>
+									<input type="hidden" name="items[<?php echo $i; ?>][id]" value ="" class="item-id">
+									<div class="error-sku" style="display: none;">
+										<span class="icon-warning">
+										</span>
+										<span class="error-sku-text"></span> 
+					                </div>	
+								</div>
+								
+							</div>
+						</div>
+					<?php } ?>
+				</div>
+
+				<div class="actions-toolbar add-row">
+		            <div class="primary">
+					    
+		                    <button id="button-botttom" data-role="add" class="alltocart-product action add-field-button" title="Add all to basket" type="button">
+		                        <span> <?= __("Add all to basket"); ?> </span>
+								<p class="add-to-basket-error-bottom" style="display: none;">You need to add some items below first</p>
+		                    </button>
+		        	</div>
+				</div>
+
+			</div>
+		</form>
+	</div>
+</div>
+
+
+<script>
+requirejs([
+	'jquery',
+	'Magento_Customer/js/customer-data',
+	'Magento_Ui/js/model/messageList',
+	'mage/translate'
+],
+    function   ($,customerData, messageList, $t) {
+    
+    $( document ).ready(function() {
+    	$('.item-input-sku').focusout(function(e){
+    	    var mediaUrl = '<?php echo $mediaUrl; ?>';
+		    if ($(this).val() != ''){
+		    	var data = {'sku': $(this).val()};
+		    	var thisElement = this;
+				var sequence =  $(this).data("input-sku");
+	    	 	$(this).closest('div').next().next().find('.error-sku').css("display","none");
+				$(".sbbc-items-value").find("[data-sbbc-item='" + sequence + "']").find(".loader-img").show();
+				if($(".sbbc-items-value").find("[data-sbbc-item='" + sequence + "']").find(".input-quantity").val() == '')
+					$(".sbbc-items-value").find("[data-sbbc-item='" + sequence + "']").find(".input-quantity").val('1');
+		    	$.ajax({
+                    url:'<?php echo $this->getUrl("shopbybrochure/index/getitembybrochurecode") ?>',
+                    type:'POST',
+                    dataType:'json',
+                    data: data,
+                    success:function(successData) {
+                    	if(successData.status == true) {
+							
+							$(".sbbc-items-value").find("[data-sbbc-item='" + sequence + "']").find('.item-name').text(successData.sku_array['name']);
+	                		$(".sbbc-items-value").find("[data-sbbc-item='" + sequence + "']").find('.item-price').text('£' + parseFloat(successData.sku_array['price']).toFixed(2));
+                    		$(".sbbc-items-value").find("[data-sbbc-item='" + sequence + "']").find('.item-id').val(successData.sku_array['entity_id']);
+                    		$(".sbbc-items-value").find("[data-sbbc-item='" + sequence + "']").find('.item-remove').css("display","block");
+							
+							$(".sbbc-items-value").find("[data-sbbc-item='" + sequence + "']").find(".product-image").attr("src",mediaUrl+successData.sku_array['odimageurl']);
+							$(".sbbc-items-value").find("[data-sbbc-item='" + sequence + "']").find(".product-image").attr("alt",successData.sku_array['odimageurl']);
+							$(".sbbc-items-value").find("[data-sbbc-item='" + sequence + "']").find(".input-description").show();
+                    	} else {
+							$(".sbbc-items-value").find("[data-sbbc-item='" + sequence + "']").find(".input-description").show();
+							$(".sbbc-items-value").find("[data-sbbc-item='" + sequence + "']").find('.error-sku-text').css("display","inline");
+							$(".sbbc-items-value").find("[data-sbbc-item='" + sequence + "']").find('.error-sku-text').text("Sorry, we do not have any products matching that code, please try again.");
+							$(".sbbc-items-value").find("[data-sbbc-item='" + sequence + "']").find('.error-sku').css("display","block");
+							$(".sbbc-items-value").find("[data-sbbc-item='" + sequence + "']").find('.icon-warning').css("display","inline-block");
+							$(".sbbc-items-value").find("[data-sbbc-item='" + sequence + "']").find('.item-name').text('');
+							$(".sbbc-items-value").find("[data-sbbc-item='" + sequence + "']").find('.item-price').text('');
+							$(".sbbc-items-value").find("[data-sbbc-item='" + sequence + "']").find('.item-id').val('');
+							$(".sbbc-items-value").find("[data-sbbc-item='" + sequence + "']").find('.item-remove').hide();
+                    	}
+				    },
+                    complete: function(data) {
+						$(".sbbc-items-value").find("[data-sbbc-item='" + sequence + "']").find(".loader-img").hide();
+                    },
+                    error: function (xhr, status, errorThrown) {
+                        console.log(xhr.responseText);
+                        errorGenerate = 1;
+                        return false;
+                    }
+                });
+		      
+		   	}
+
+		});
+
+		$(document).on('click','.item-remove',function(e) { 
+			var sequence =  $(this).data("item-remove");
+			$(".sbbc-items-value").find("[data-sbbc-item='" + sequence + "']").find('.error-sku').css("display","none");
+			$(".sbbc-items-value").find("[data-sbbc-item='" + sequence + "']").find(".input-quantity").val('');
+			$(".sbbc-items-value").find("[data-sbbc-item='" + sequence + "']").find(".item-input-sku").val('');
+			$(".sbbc-items-value").find("[data-sbbc-item='" + sequence + "']").find('.error-sku').text('');
+			$(".sbbc-items-value").find("[data-sbbc-item='" + sequence + "']").find('.error-sku').css("display","block");
+			$(".sbbc-items-value").find("[data-sbbc-item='" + sequence + "']").find('.item-name').html('');
+			$(".sbbc-items-value").find("[data-sbbc-item='" + sequence + "']").find('.item-price').html('');
+			$(".sbbc-items-value").find("[data-sbbc-item='" + sequence + "']").find('.item-id').val('');
+			$(".sbbc-items-value").find("[data-sbbc-item='" + sequence + "']").find(".input-description").hide();
+			$(".sbbc-items-value").find("[data-sbbc-item='" + sequence + "']").find('.item-remove').hide();
+		});
+
+    	var sections = ['cart'];  
+
+		$(document).on('click','.alltocart-product',function(e) { 
+			e.preventDefault();
+			var inputs = $("input.item-id");
+			var sum = 0;
+			var id = $(this).attr('id');
+			for(var i = 0; i < inputs.length; i++){
+				if ( $.isNumeric($(inputs[i]).val()) ){
+			   		 sum += 1;
+			   	}
+
+			}
+			if(sum < 1){
+                if (id == "submit") {
+					$('.add-to-basket-error').css("display","block");
+				    $('.add-to-basket-error').css("bottom","89%");
+					$('.add-to-basket-error').css("left", "87.5%");
+				    setTimeout(function () {
+	                    $('.add-to-basket-error').css("display","none");
+	                }, 3000);
+					 
+				    return false;
+				}
+					if (id == "button-botttom") {
+                    $('.add-to-basket-error-bottom').css("display","block");
+					$('.add-to-basket-error-bottom').css("top","92.5%");
+					$('.add-to-basket-error-bottom').css("left", "92%");
+				    setTimeout(function () {
+	                    $('.add-to-basket-error-bottom').css("display","none");
+	                }, 3000);
+				    return false;
+				}
+				$(document).ready(function() {
+			    $(window).scrollTop(0);
+				});
+
+
+			 	
+			}
+			$("div.zipcode-form").remove();
+		    $("div.zipcode-form-1").remove();
+		    $(this).closest('.sbbc-controls').find('.actions-primary').prepend(addToAllZipCodeForm());
+		    $(".zipcode-form").not(this).each(function () {
+		        $(this).hide();
+		    });
+		    $(".zipcode-form-1").not(this).each(function () {
+		        $(this).hide();
+		    });
+		    if($.cookie('zipcode_availability') == null || $.cookie('zipcode_availability') == '') {
+		        var zipcodecurrentlocation = $(this).closest('.actions-primary').find('#zipcode-input').val();
+		        var zipcodeFrom = $(this).closest('.actions-primary').find('.zipcode-form');
+		        if(!zipcodecurrentlocation) {
+		            e.preventDefault();
+		            zipcodeFrom.show();
+					var position = $('.zipcode-form').offset();
+					if (position.top < 710) {
+						window.scrollTo(0, 600);
+					}
+		            return false;
+		        }
+		    } else {
+		    	var data = $('#submit_form').serialize();
+		       	addAllItemsToCart(data);
+				   console.log(data);
+		    }
+		});
+
+		$(document).on('click','.add-all-to-zipcode-confirm-button-product',function(e) {
+			var data = $('#submit_form').serialize();
+			var zipcodecurrentlocation = $(this).closest('.actions-primary').find('#zipcode-input').val();
+			$.cookie('zipcode_availability',zipcodecurrentlocation);
+		 	$(".current-location-zipcode").html(zipcodecurrentlocation);
+		 	var zipcodeFrom = $("div.zipcode-form");
+	       	var zipcodeFrom1 = $("div.zipcode-form-1");
+		   	zipcodeFrom.hide();
+		   	zipcodeFrom1.hide();
+	        addAllItemsToCart(data);
+	 	}); 
+
+		function addAllItemsToCart(data){
+			$.ajax({
+                url:'<?php echo $this->getUrl("shopbybrochure/index/addtocart") ?>',
+                type:'POST',
+                showLoader: true,
+                dataType:'json',
+                data: data,
+                success:function(response_data_json) {
+					var sections = ['cart'];
+					customerData.invalidate(sections);
+					customerData.reload(sections, true);
+    	 	        messageList.addSuccessMessage({ message: $t("Added to cart successfully") });
+                 	location.reload();
+				}               
+            });
+		}
+
+		function addToAllZipCodeForm(){
+        	var zipCodeFormHhtml = '<div class="zipcode-form" style="display: none;right:0.3%;"> <div class="dpm-TitleBar"><div class="dpm-Title" id="js-dpm-Title">Enter your delivery postcode</div><div class="dpm-CloseButton" id="js-dpm-CloseButton"><svg class="amtheme-icon"><use xlink:href="#icon-close"></use></svg></div></div> <div class="delivery-steps"> So that we can make sure your shopping experience is as quick and easy as possible, we need to find your local Wiltshire Farm Foods outlet.</div>  <div class="delievery-form"><form action="/" method="post"> <input type="text" id="zipcode-input" placeholder="Please enter zipcode."><input type="button" class="action primary zipcode-submit-button-product" value="Check availability" > <div for="zipcode" id="zipcode-error" generated="true" style="display:none;" class="mage-error zipcode-error" id="zipcode-error"> Enter your delivery postcode.</div><div for="zipcode" id="zipcode-error-wrongformat" generated="true" style="display:none;" class="mage-error zipcode-error-wrongformat">Please enter the postcode in the correct format e.g. AB12 3CD. </div><div for="zipcode" id="zipcode-error-notfound" generated="true" style="display:none;" class="mage-error zipcode-error-notfound">Unable to find Post-code Delivery.</div></form></div>  </div>';
+        	zipCodeFormHhtml += '<div class="zipcode-form-1" style="display: none;right:0;"><div class="dpm-TitleBar"><div class="dpm-Title" id="js-dpm-Title">Confirm your delivery postcode</div><div class="dpm-CloseButton" id="js-dpm-CloseButton"><svg class="amtheme-icon"><use xlink:href="#icon-close"></use></svg></div></div><div class="delievery-form"><form action="/" method="post"><label>Delivery Postcode</label><label class="postcode-delivery-header"></label><label>Your Outlet</label><label class="postcode-delivery-header-outlate"></label><a class="postcode-delivery-header-telephone" href="javascript:void(0);"></a><input type="hidden" class="vendor-id-delivery-form" value=""><label class="postcode-delivery-header-timings">Monday to Friday 9am to 5pm</label><label style="color: red;" class="mage-error not-found-error-vendor"></label><div class="action primary zipcode-Back-button-product"><input type="button" class="backinput" value="Back" ></div><input type="button" class="action primary add-all-to-zipcode-confirm-button-product zipcode-confirm-button" value="Confirm Postcode" ><div for="zipcode" id="zipcode-error" generated="true" style="display: none;" class="mage-error zipcode-error" id="zipcode-error">Enter your delivery Post-code.</div><div for="zipcode" id="zipcode-error-wrongformat" generated="true" style="display: none;" class="mage-error zipcode-error-wrongformat" >Please enter the postcode in the correct format e.g. AB12 3CD.</div><div for="zipcode" id="zipcode-error-notfound" generated="true" style="display: none;" class="mage-error zipcode-error-notfound" >Unable to find Post-code.</div></form></div></div>';
+        	return zipCodeFormHhtml;
+     	}
+	});
+});
+</script>
